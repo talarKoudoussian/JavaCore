@@ -1,44 +1,36 @@
 package com.talar.server;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class Client {
 
-	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException {
-        //get the localhost IP address, if server is running on some other IP, you need to use that
-        InetAddress host = InetAddress.getLocalHost();
-        int port = 3000;
-        Socket socket = null;
-        ObjectOutputStream outputStream = null;
-        ObjectInputStream inputStream = null;
-        
-        for(int i=0; i<5; i++){
-        	
-            //establish socket connection to server
-            socket = new Socket(host.getHostName(), port);
-            
-            //write to socket using ObjectOutputStream
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            System.out.println("Sending request to Socket Server");
-            
-            if(i==4) {
-            	outputStream.writeObject("exit");
-            }
-            else {
-            	outputStream.writeObject("" + i);
-            }
-            
-            //read the server response message
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            String message = (String) inputStream.readObject();
-            System.out.println("Message: " + message);
-            
-            //close resources
-            inputStream.close();
-            outputStream.close();
-            Thread.sleep(100);
+        public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException {
+
+                Socket socket = new Socket("localhost", 3000);
+                System.out.println("Connected");
+                
+                BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+                BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+                
+                bos.write("Hi how are you?\0".getBytes());
+                bos.flush();
+                
+                System.out.println("waiting for read");
+                
+                StringBuilder sb = new StringBuilder();
+                while(true) {
+                        int c = bis.read();
+                        if(c == 0) {
+                                break;
+                        }
+                        
+                        sb.append((char)c);
+                }
+                
+                System.out.println("Received: "+sb.toString());
         }
-    }
-	
 }
