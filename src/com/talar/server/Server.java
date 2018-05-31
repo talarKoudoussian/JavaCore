@@ -9,6 +9,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class Server {
@@ -61,7 +63,7 @@ public class Server {
                                 String outMessage = "Server Received: \0" + sb.toString();
                                 System.out.println(outMessage);
                                 bos.write(received.getBytes());
-                                String response = getResponse(received);
+                                String response = respond(received); // getResponse(received);
                                 bos.write(response.getBytes());
                                 bos.flush();
 
@@ -167,7 +169,56 @@ public class Server {
 
                 return response;
         }
+        
+        private String respond(String message) {
+                message = message.toLowerCase();
+                String response = "";
+               
+                switch(message) {
+                        case "date": {
+                                response = getDate();
+                                break;
+                        }
+                        case "date:iso8601": {
+                                response = getISODate();
+                                break;
+                        }
+                        case "datetime:iso8601": {
+                                response = getISODateTime();
+                                break;
+                        }
+                        default: {
+                                response = "Message Unknown";
+                                break;
+                        }
+                }
+                
+                return response;
+        }
+        
+        private String getDate() {
+                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+                Date date = new Date();
+                String response = sdf.format(date);
+                return response;
+        }
 
+        private String getISODate() {
+                String response = "";
+                LocalDateTime dateNow = LocalDateTime.now();
+                DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
+                response = dateNow.format(dtf);
+                return response;
+        }
+        
+        private String getISODateTime() {
+                String response = "";
+                LocalDateTime dateNow = LocalDateTime.now();
+                DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+                response = dateNow.format(dtf);
+                return response;
+        }
+        
         public static void main(String... args) {
                 Server srv = new Server();
                 srv.setPort(3000);

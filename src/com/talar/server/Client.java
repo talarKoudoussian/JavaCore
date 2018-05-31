@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class Client {
 
-        public static void main(String[] args) throws UnknownHostException, IOException {
+        public static void main(String... args) throws UnknownHostException, IOException {
 
                 Socket socket = new Socket("localhost", 3000);
                 System.out.println("Connected");
@@ -23,7 +23,6 @@ public class Client {
                 int randNbr = rand.nextInt(requestMessages.length);
                 String message = requestMessages[randNbr];
                 System.out.println(message);
-
 
                 bos.write(message.getBytes());
                 bos.flush();
