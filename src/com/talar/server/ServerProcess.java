@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -24,25 +25,30 @@ public class ServerProcess extends Thread {
                 clientOn = true;
                 serverOn = true;
                 
-                try {
-                        InputStream in = socket.getInputStream();
-                        OutputStream out = socket.getOutputStream();
-                        bis = new BufferedInputStream(in);
-                        bos = new BufferedOutputStream(out);
-                }
-                catch(IOException e) {
-                        e.printStackTrace();
-                }
+                InetAddress addr = socket.getInetAddress();
+                String ipAddr = addr.getHostAddress();
+                System.out.println("Client connected " + ipAddr + ":" + socket.getLocalPort());
+        }
+        
+        public void init() throws IOException {
+                InputStream in = socket.getInputStream();
+                OutputStream out = socket.getOutputStream();
+                bis = new BufferedInputStream(in);
+                bos = new BufferedOutputStream(out);
         }
 
         @Override
         public void run() {
-                String message = readInput();
-                System.out.println("Server Received: " + message);
-                
-                String response = getResponse(message);
-                System.out.println("Response: " + response);
-                writeOutput(response);
+                while(isClientOn()) {
+                        String message = readInput();
+                        System.out.println("Server Received: " + message);
+
+                        String response = getResponse(message);
+                        System.out.println("Response: " + response);
+                        writeOutput(response);
+                }
+
+                close();
         }
 
         private String readInput() {
@@ -241,5 +247,4 @@ public class ServerProcess extends Thread {
         public boolean isServerOn() {
                 return this.serverOn;
         }
-
 }

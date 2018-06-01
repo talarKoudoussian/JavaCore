@@ -9,13 +9,13 @@ public class Server {
 
         private int port = 0;
         private ServerSocket server = null;
-
+        private Socket socket = null;
+        
         public Server() {
 
         }
 
         public void start() {
-                Socket socket = null;
                 boolean loop = false;
 
                 try {
@@ -24,19 +24,17 @@ public class Server {
 
                         while(loop) {
                                 System.out.println("Server started on port " + getPort());
-
-                                socket = server.accept();
-
+                                Socket socket = server.accept();
+                                
                                 ServerProcess sp = new ServerProcess(socket);
-
-                                InetAddress addr = socket.getInetAddress();
-                                String ipAddr = addr.getHostAddress();
-                                System.out.println("Client connected " + ipAddr + ":" + socket.getLocalPort());
-
-                                while(sp.isClientOn()) {
-                                        sp.run();
-                                        loop = sp.isServerOn();
+                                try {
+                                        sp.init();
                                 }
+                                catch(IOException e) {
+                                        e.printStackTrace();
+                                }
+                                
+                                sp.start();
                         }
                 }
                 catch(IOException ex) {
