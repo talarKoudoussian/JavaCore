@@ -33,9 +33,8 @@ public class ClientDate {
                                 loop = false;
                         }
                         
-                        sendMessage += "\0";
-                        
                         bos.write(sendMessage.getBytes());
+                        bos.write("\0".getBytes());
                         bos.flush();
         
                         StringBuilder sb = new StringBuilder();
@@ -52,7 +51,7 @@ public class ClientDate {
                         
                         receiveMessage = sb.toString();
                         
-                        if(receiveMessage != null)
+                        if(receiveMessage != "")
                         {
                                 System.out.println("Received from server: " + receiveMessage);
                         }
